@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, TextInput } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Text, View } from "@/components/Themed";
 import { useControllerConfig } from "@/context/ControllerConfig";
@@ -28,51 +29,74 @@ export default function ConfigScreen() {
   }, [input, setBaseUrl]);
 
   return (
-    <ScrollView contentContainerStyle={styles.screen}>
-      <View style={styles.backdropOne} />
-      <View style={styles.backdropTwo} />
+    <SafeAreaView style={styles.page}>
+      <ScrollView contentContainerStyle={styles.screen}>
+        <View style={styles.backdropOne} />
+        <View style={styles.backdropTwo} />
 
-      <View style={styles.card}>
-        <Text style={styles.eyebrow}>Connection</Text>
-        <Text style={styles.title}>Controller Base URL</Text>
-        <Text style={styles.subtitle}>Used for all LED commands and mode sync.</Text>
-
-        <View style={styles.inputShell}>
-          <TextInput
-            value={input}
-            onChangeText={setInput}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            placeholder="http://192.168.4.1"
-            placeholderTextColor="#7b8fb1"
-            style={styles.input}
-            editable={isReady}
-          />
-          <Text style={styles.helper}>Example: http://192.168.4.1</Text>
+        <View style={styles.pageHeader}>
+          <Text style={styles.pageTitle}>Configuration</Text>
+          <Text style={styles.pageSubtitle}>Set the controller base URL so commands can reach your tower.</Text>
         </View>
 
-        <Pressable
-          style={[styles.saveButton, (!isReady || saving) && styles.saveButtonDisabled]}
-          onPress={handleSave}
-          disabled={!isReady || saving}
-        >
-          <Text style={styles.saveButtonText}>{saving ? "Saving..." : "Save"}</Text>
-        </Pressable>
+        <View style={styles.card}>
+          <Text style={styles.eyebrow}>Connection</Text>
+          <Text style={styles.title}>Controller Base URL</Text>
+          <Text style={styles.subtitle}>Used for all LED commands and mode sync.</Text>
 
-        {status ? <Text style={styles.status}>{status}</Text> : null}
-      </View>
-    </ScrollView>
+          <View style={styles.inputShell}>
+            <TextInput
+              value={input}
+              onChangeText={setInput}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+              placeholder="http://192.168.4.1"
+              placeholderTextColor="#7b8fb1"
+              style={styles.input}
+              editable={isReady}
+            />
+            <Text style={styles.helper}>Example: http://192.168.4.1</Text>
+          </View>
+
+          <Pressable
+            style={[styles.saveButton, (!isReady || saving) && styles.saveButtonDisabled]}
+            onPress={handleSave}
+            disabled={!isReady || saving}
+          >
+            <Text style={styles.saveButtonText}>{saving ? "Saving..." : "Save"}</Text>
+          </Pressable>
+
+          {status ? <Text style={styles.status}>{status}</Text> : null}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: "#04041f",
+  },
   screen: {
     flexGrow: 1,
     padding: 20,
     gap: 16,
-    backgroundColor: "#04041f",
     paddingBottom: 36,
+  },
+  pageHeader: {
+    gap: 6,
+  },
+  pageTitle: {
+    color: "#fffdff",
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  pageSubtitle: {
+    color: "#d3ddff",
+    fontSize: 14,
+    lineHeight: 20,
   },
   backdropOne: {
     position: "absolute",

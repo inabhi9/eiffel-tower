@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   View as RNView,
@@ -15,13 +16,14 @@ import { Text, View } from "@/components/Themed";
 import { useControllerConfig } from "@/context/ControllerConfig";
 
 export default function TowerControlScreen() {
-  const { baseUrl, setBaseUrl } = useControllerConfig();
+  const { baseUrl, setBaseUrl, isReady } = useControllerConfig();
   const [controllerUrl, setControllerUrl] = useState(baseUrl);
   const [power, setPower] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [isSyncingMode, setIsSyncingMode] = useState(false);
   const [isSettingMode, setIsSettingMode] = useState(false);
   const [isSettingDuration, setIsSettingDuration] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [ledOnUntil, setLedOnUntil] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,8 @@ export default function TowerControlScreen() {
   const hourOptions = useMemo(() => Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`), []);
   const durationOptions = useMemo(() => [1, 2, 3, 4, 5], []);
   const scheduleDisabled = !power;
+
+  const formatHour = useCallback((hour: number) => `${String(Math.min(23, Math.max(0, Math.floor(hour)))).padStart(2, "0")}:00`, []);
 
   const parseMinutes = useCallback((value: string) => {
     const [h, m = "0"] = value.split(":");
@@ -122,7 +126,7 @@ export default function TowerControlScreen() {
       if (isSettingDuration) return;
       setIsSettingDuration(true);
       try {
-        const url = new URL(`/config?name=duration&value=${clamped}`, controllerUrl).toString();
+        const url = new URL(`/config?name=on_duration&value=${clamped}`, controllerUrl).toString();
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
         const resp = await fetch(url, { signal: controller.signal });
@@ -163,6 +167,30 @@ export default function TowerControlScreen() {
       return "";
     }
   }, [controllerUrl]);
+
+  const fetchConfigValue = useCallback(
+    async (name: string) => {
+      let url: string;
+      try {
+        url = new URL(`/config?name=${name}`, controllerUrl).toString();
+      } catch (err) {
+        throw new Error("Controller URL is not valid.");
+      }
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+
+      if (!resp.ok) {
+        const detail = await resp.text();
+        throw new Error(detail || `Controller returned ${resp.status}`);
+      }
+
+      return await resp.text();
+    },
+    [controllerUrl],
+  );
 
   const clearLedTimer = useCallback(() => {
     if (ledTimerRef.current) {
@@ -250,7 +278,6 @@ export default function TowerControlScreen() {
 
   const fetchMode = useCallback(async () => {
     if (!modeUrl) {
-      setError("Controller URL is not valid.");
       return;
     }
 
@@ -328,9 +355,62 @@ export default function TowerControlScreen() {
     [controllerUrl, isSettingMode, power, setBaseUrl],
   );
 
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    setError(null);
+    setScheduleError(null);
+
+    const modePromise = fetchMode();
+
+    try {
+      const [startBody, stopBody, durationBody] = await Promise.all([
+        fetchConfigValue("start_hour"),
+        fetchConfigValue("stop_hour"),
+        fetchConfigValue("on_duration"),
+      ]);
+
+      const extractNumber = (body: string, key: string) => {
+        const match = new RegExp(`${key}\\s*=\\s*(\\d+)`, "i").exec(body);
+        if (!match) {
+          throw new Error(`${key} response missing value`);
+        }
+        const value = Number(match[1]);
+        if (!Number.isFinite(value)) {
+          throw new Error(`${key} response contained an invalid number`);
+        }
+        return value;
+      };
+
+      const startHour = extractNumber(startBody, "start_hour");
+      const stopHour = extractNumber(stopBody, "stop_hour");
+      const durationValue = extractNumber(durationBody, "on_duration");
+
+      setScheduleStart(formatHour(startHour));
+      setScheduleEnd(formatHour(stopHour));
+      setDurationMinutes(durationValue);
+
+      const startMinutes = startHour * 60;
+      const stopMinutes = stopHour * 60;
+      setScheduleError(startMinutes >= stopMinutes ? "From must be earlier than To" : null);
+      setStatus("Settings synced from controller");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message.includes("AbortError") ? "Refresh timed out" : message);
+    } finally {
+      await modePromise.catch(() => undefined);
+      setIsRefreshing(false);
+    }
+  }, [fetchConfigValue, fetchMode, formatHour]);
+
   useEffect(() => {
     fetchMode();
   }, [fetchMode]);
+
+  useEffect(() => {
+    if (!isReady) return;
+    if (!controllerUrl.trim()) return;
+    handleRefresh();
+  }, [isReady, controllerUrl, handleRefresh]);
 
   const bumpBrightness = useCallback(
     (delta: number) => {
@@ -340,7 +420,10 @@ export default function TowerControlScreen() {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.screen}>
+    <ScrollView
+      contentContainerStyle={styles.screen}
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#E5E7EB" />}
+    >
       <View style={styles.headerCard}>
         <Pressable
           style={[styles.roundButton, ledOnUntil && ledOnUntil > Date.now() ? styles.roundButtonOn : styles.roundButtonOff]}

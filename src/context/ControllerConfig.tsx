@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "controllerBaseUrl";
-const DEFAULT_BASE_URL = "http://192.168.4.1";
+const DEFAULT_BASE_URL = "";
 
 type ControllerConfigValue = {
   baseUrl: string;

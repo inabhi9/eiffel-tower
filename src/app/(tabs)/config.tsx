@@ -3,7 +3,6 @@ import { Pressable, StyleSheet, TextInput } from "react-native";
 
 import { Text, View } from "@/components/Themed";
 import { useControllerConfig } from "@/context/ControllerConfig";
-
 export default function ConfigScreen() {
   const { baseUrl, setBaseUrl, isReady } = useControllerConfig();
   const [input, setInput] = useState(baseUrl);
@@ -18,15 +17,15 @@ export default function ConfigScreen() {
     setSaving(true);
     setStatus(null);
     try {
-      await setBaseUrl(input.trim() || baseUrl);
-      setStatus("Saved");
+      await setBaseUrl(input.trim());
+      setStatus(input.trim() ? "Saved" : "Cleared; setup required");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setStatus(`Failed: ${message}`);
     } finally {
       setSaving(false);
     }
-  }, [input, setBaseUrl, baseUrl]);
+  }, [input, setBaseUrl]);
 
   return (
     <View style={styles.screen}>

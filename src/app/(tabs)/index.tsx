@@ -8,37 +8,16 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  TextInput,
   View as RNView,
 } from "react-native";
 
 import { Text, View } from "@/components/Themed";
 import { useControllerConfig } from "@/context/ControllerConfig";
 
-type Pattern = "steady" | "breathe" | "sparkle" | "wave";
-
-const colorPresets: Array<{ label: string; value: string }> = [
-  { label: "Warm", value: "#FFD166" },
-  { label: "Sunset", value: "#FF7B7B" },
-  { label: "Aurora", value: "#6EE7B7" },
-  { label: "Ice", value: "#7BDFF2" },
-  { label: "Royal", value: "#6C63FF" },
-];
-
-const patterns: Array<{ label: string; value: Pattern; hint: string }> = [
-  { label: "Steady", value: "steady", hint: "Solid glow" },
-  { label: "Breathe", value: "breathe", hint: "Slow fade" },
-  { label: "Sparkle", value: "sparkle", hint: "Twinkle bursts" },
-  { label: "Wave", value: "wave", hint: "Rolling sweep" },
-];
-
 export default function TowerControlScreen() {
   const { baseUrl, setBaseUrl } = useControllerConfig();
   const [controllerUrl, setControllerUrl] = useState(baseUrl);
   const [power, setPower] = useState(true);
-  const [color, setColor] = useState(colorPresets[0].value);
-  const [brightness, setBrightness] = useState(75);
-  const [pattern, setPattern] = useState<Pattern>("steady");
   const [isSending, setIsSending] = useState(false);
   const [isSyncingMode, setIsSyncingMode] = useState(false);
   const [isSettingMode, setIsSettingMode] = useState(false);
@@ -53,6 +32,7 @@ export default function TowerControlScreen() {
 
   const hourOptions = useMemo(() => Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`), []);
   const durationOptions = useMemo(() => [1, 2, 3, 4, 5], []);
+  const scheduleDisabled = !power;
 
   const parseMinutes = useCallback((value: string) => {
     const [h, m = "0"] = value.split(":");
@@ -142,7 +122,7 @@ export default function TowerControlScreen() {
       if (isSettingDuration) return;
       setIsSettingDuration(true);
       try {
-        const url = new URL(`/config?name=on_duration&value=${clamped}`, controllerUrl).toString();
+        const url = new URL(`/config?name=duration&value=${clamped}`, controllerUrl).toString();
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
         const resp = await fetch(url, { signal: controller.signal });
@@ -359,15 +339,6 @@ export default function TowerControlScreen() {
     [],
   );
 
-  const quickScenes = useMemo(
-    () => [
-      { title: "Paris Night", next: { color: "#6C63FF", pattern: "breathe" as Pattern, brightness: 60 } },
-      { title: "Sunrise", next: { color: "#FFB347", pattern: "wave" as Pattern, brightness: 85 } },
-      { title: "Spark", next: { color: "#FF7B7B", pattern: "sparkle" as Pattern, brightness: 90 } },
-    ],
-    [],
-  );
-
   return (
     <ScrollView contentContainerStyle={styles.screen}>
       <View style={styles.headerCard}>
@@ -392,12 +363,7 @@ export default function TowerControlScreen() {
       </View>
 
       <View style={styles.card}>
-        <RNView style={styles.cardHeaderRow}>
-          <Text style={styles.cardTitle}>Mode</Text>
-          <Pressable style={styles.syncButton} onPress={fetchMode} disabled={isSyncingMode}>
-            {isSyncingMode ? <ActivityIndicator color="#E5E7EB" /> : <Text style={styles.syncButtonText}>Sync</Text>}
-          </Pressable>
-        </RNView>
+        <Text style={styles.cardTitle}>Mode</Text>
         <RNView style={styles.row}>
           <ToggleButton label="Auto" active={power} onPress={() => updateMode(true)} />
           <ToggleButton label="Manual" active={!power} onPress={() => updateMode(false)} />
@@ -415,6 +381,7 @@ export default function TowerControlScreen() {
               value={scheduleStart}
               onChange={handleScheduleStartChange}
               options={hourOptions}
+              disabled={scheduleDisabled}
             />
           </RNView>
           <RNView style={styles.timeField}>
@@ -424,6 +391,7 @@ export default function TowerControlScreen() {
               value={scheduleEnd}
               onChange={handleScheduleEndChange}
               options={hourOptions}
+              disabled={scheduleDisabled}
             />
           </RNView>
         </RNView>
@@ -433,76 +401,14 @@ export default function TowerControlScreen() {
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Duration</Text>
         <Text style={styles.subtitle}>Blink length</Text>
-        <DurationSelect value={durationMinutes} onChange={handleDurationChange} options={durationOptions} />
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Colors</Text>
-        <RNView style={styles.swatchRow}>
-          {colorPresets.map((preset) => (
-            <Pressable
-              key={preset.value}
-              style={[styles.swatch, { backgroundColor: preset.value }, color === preset.value && styles.swatchActive]}
-              onPress={() => setColor(preset.value)}
-              accessibilityLabel={`Set color ${preset.label}`}
-            />
-          ))}
-        </RNView>
-        <TextInput
-          value={color}
-          onChangeText={setColor}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="#FFD166"
-          style={styles.input}
+        <DurationSelect
+          value={durationMinutes}
+          onChange={handleDurationChange}
+          options={durationOptions}
+          disabled={scheduleDisabled}
         />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Brightness</Text>
-        <RNView style={styles.row}>
-          <Pressable style={styles.pillButton} onPress={() => bumpBrightness(-10)}>
-            <Text style={styles.pillText}>-</Text>
-          </Pressable>
-          <Text style={styles.brightnessValue}>{brightness}%</Text>
-          <Pressable style={styles.pillButton} onPress={() => bumpBrightness(10)}>
-            <Text style={styles.pillText}>+</Text>
-          </Pressable>
-        </RNView>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Pattern</Text>
-        <RNView style={styles.rowWrap}>
-          {patterns.map((item) => (
-            <ToggleButton
-              key={item.value}
-              label={item.label}
-              caption={item.hint}
-              active={pattern === item.value}
-              onPress={() => setPattern(item.value)}
-            />
-          ))}
-        </RNView>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Quick Scenes</Text>
-        {quickScenes.map((scene) => (
-          <Pressable
-            key={scene.title}
-            style={styles.sceneRow}
-            onPress={() => {
-              setColor(scene.next.color);
-              setPattern(scene.next.pattern);
-              setBrightness(scene.next.brightness);
-            }}
-          >
-            <Text style={styles.sceneTitle}>{scene.title}</Text>
-            <Text style={styles.sceneDetail}>{`${scene.next.brightness}% • ${scene.next.pattern}`}</Text>
-          </Pressable>
-        ))}
-      </View>
     </ScrollView>
   );
 }
@@ -531,12 +437,22 @@ function HourSelect({
   value,
   onChange,
   options,
+  disabled,
 }: {
   label: string;
   value: string;
   onChange: (next: string) => void;
   options: string[];
+  disabled?: boolean;
 }) {
+  if (disabled) {
+    return (
+      <Pressable style={[styles.hourButton, styles.hourButtonDisabled]} disabled>
+        <Text style={[styles.hourButtonValue, styles.hourButtonDisabledText]}>{value}</Text>
+      </Pressable>
+    );
+  }
+
   if (Platform.OS === "ios") {
     const openSheet = () => {
       ActionSheetIOS.showActionSheetWithOptions(
@@ -583,12 +499,22 @@ function DurationSelect({
   value,
   onChange,
   options,
+  disabled,
 }: {
   value: number;
   onChange: (next: number) => void;
   options: number[];
+  disabled?: boolean;
 }) {
   const labels = options.map((opt) => `${opt} minute${opt > 1 ? "s" : ""}`);
+
+  if (disabled) {
+    return (
+      <Pressable style={[styles.hourButton, styles.hourButtonDisabled]} disabled>
+        <Text style={[styles.hourButtonValue, styles.hourButtonDisabledText]}>{`${value} minute${value > 1 ? "s" : ""}`}</Text>
+      </Pressable>
+    );
+  }
 
   if (Platform.OS === "ios") {
     const openSheet = () => {
@@ -716,39 +642,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  hourButtonDisabled: {
+    opacity: 0.6,
+    borderColor: "#2f3542",
+  },
+  hourButtonDisabledText: {
+    color: "#6B7280",
+  },
   status: {
     color: "#9CA3AF",
     fontSize: 13,
   },
   errorText: {
     color: "#FCA5A5",
-  },
-  connectionRow: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-  },
-  input: {
-    flex: 1,
-    backgroundColor: "#1F2937",
-    color: "#E5E7EB",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#374151",
-  },
-  sendButton: {
-    backgroundColor: "#22C55E",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 10,
-    minWidth: 88,
-    alignItems: "center",
-  },
-  sendButtonText: {
-    color: "#0B1C2C",
-    fontWeight: "700",
   },
   card: {
     backgroundColor: "#111827",
@@ -788,48 +694,6 @@ const styles = StyleSheet.create({
     gap: 10,
     alignItems: "center",
   },
-  rowWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  swatchRow: {
-    flexDirection: "row",
-    gap: 10,
-    flexWrap: "wrap",
-  },
-  swatch: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "transparent",
-  },
-  swatchActive: {
-    borderColor: "#22C55E",
-  },
-  pillButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#374151",
-    backgroundColor: "#1F2937",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pillText: {
-    color: "#E5E7EB",
-    fontSize: 20,
-    fontWeight: "700",
-  },
-  brightnessValue: {
-    color: "#E5E7EB",
-    fontSize: 18,
-    fontWeight: "600",
-    flex: 1,
-    textAlign: "center",
-  },
   toggle: {
     flex: 1,
     padding: 12,
@@ -853,19 +717,6 @@ const styles = StyleSheet.create({
   toggleCaption: {
     color: "#9CA3AF",
     fontSize: 12,
-    marginTop: 2,
-  },
-  sceneRow: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1F2937",
-  },
-  sceneTitle: {
-    color: "#E5E7EB",
-    fontWeight: "600",
-  },
-  sceneDetail: {
-    color: "#9CA3AF",
     marginTop: 2,
   },
 });

@@ -11,6 +11,7 @@ import {
   StyleSheet,
   View as RNView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Text, View } from "@/components/Themed";
 import { useControllerConfig } from "@/context/ControllerConfig";
@@ -161,6 +162,10 @@ export default function TowerControlScreen() {
   }, [controllerUrl]);
 
   const blinkUrl = useMemo(() => {
+          <View style={styles.pageHeader}>
+            <Text style={styles.pageTitle}>Eiffel Tower LED</Text>
+            <Text style={styles.pageSubtitle}>Control, schedule, and blink your tower over Wi-Fi.</Text>
+          </View>
     try {
       return new URL("/blink", controllerUrl).toString();
     } catch (err) {
@@ -420,79 +425,114 @@ export default function TowerControlScreen() {
   );
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.screen}
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#E5E7EB" />}
-    >
-      <View style={styles.headerCard}>
-        <Pressable
-          style={[styles.roundButton, ledOnUntil && ledOnUntil > Date.now() ? styles.roundButtonOn : styles.roundButtonOff]}
-          onPress={sendCommand}
-          disabled={isSending || (ledOnUntil !== null && ledOnUntil > Date.now())}
-          accessibilityLabel="Blink LED"
-        >
-          {isSending ? (
-            <ActivityIndicator color="#0B1C2C" size="large" />
-          ) : (
-            <FontAwesome name="lightbulb-o" size={56} color="#0B1C2C" />
-          )}
-        </Pressable>
-        {status ? <Text style={styles.status}>{status}</Text> : null}
-        {error ? (
-          <Text style={[styles.status, styles.errorText]} accessibilityLiveRegion="polite">
-            {error}
+    <SafeAreaView style={styles.page}>
+      <View style={styles.backdropOne} />
+      <View style={styles.backdropTwo} />
+
+      <ScrollView
+        contentContainerStyle={styles.screen}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#ff4fd8" />}
+      >
+        <View style={styles.pageHeader}>
+          <Text style={styles.pageTitle}>Eiffel Tower LED</Text>
+          <Text style={styles.pageSubtitle}>Control, schedule, and blink your tower over Wi-Fi.</Text>
+        </View>
+        <View style={styles.heroCard}>
+          <Text style={styles.heroKicker}>Eiffel Tower LEDs</Text>
+          <Text style={styles.heroTitle}>Light show, on tap.</Text>
+          <Text style={styles.heroSubtitle}>
+            Blink the tower, schedule glow hours, and toggle auto mode with a playful control board.
           </Text>
-        ) : null}
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Mode</Text>
-        <RNView style={styles.row}>
-          <ToggleButton label="Auto" active={power} onPress={() => updateMode(true)} />
-          <ToggleButton label="Manual" active={!power} onPress={() => updateMode(false)} />
-        </RNView>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Schedule</Text>
-        <Text style={styles.subtitle}>Set a daily time range (24h)</Text>
-        <RNView style={styles.timeRow}>
-          <RNView style={styles.timeField}>
-            <Text style={styles.timeLabel}>From</Text>
-            <HourSelect
-              label="From"
-              value={scheduleStart}
-              onChange={handleScheduleStartChange}
-              options={hourOptions}
-              disabled={scheduleDisabled}
-            />
+          <RNView style={styles.heroChips}>
+            <View style={styles.chip}>
+              <Text style={styles.chipLabel}>Base URL</Text>
+              <Text style={styles.chipValue} numberOfLines={1}>
+                {controllerUrl || "Not set"}
+              </Text>
+            </View>
+            <View style={[styles.chip, styles.chipAlt]}>
+              <Text style={styles.chipLabel}>Mode</Text>
+              <Text style={styles.chipValue}>{power ? "Auto" : "Manual"}</Text>
+            </View>
           </RNView>
-          <RNView style={styles.timeField}>
-            <Text style={styles.timeLabel}>To</Text>
-            <HourSelect
-              label="To"
-              value={scheduleEnd}
-              onChange={handleScheduleEndChange}
-              options={hourOptions}
-              disabled={scheduleDisabled}
-            />
+        </View>
+
+        <View style={styles.headerCard}>
+          <Text style={styles.cardEyebrow}>Instant Blink</Text>
+          <Text style={styles.cardTitle}>Spark the lights now</Text>
+          <Pressable
+            style={[styles.roundButton, ledOnUntil && ledOnUntil > Date.now() ? styles.roundButtonOn : styles.roundButtonOff]}
+            onPress={sendCommand}
+            disabled={isSending || (ledOnUntil !== null && ledOnUntil > Date.now())}
+            accessibilityLabel="Blink LED"
+          >
+            {isSending ? (
+              <ActivityIndicator color="#04041f" size="large" />
+            ) : (
+              <FontAwesome name="lightbulb-o" size={56} color="#04041f" />
+            )}
+          </Pressable>
+          <Text style={styles.cardHint}>Tap to blink for the configured duration.</Text>
+          {status ? <Text style={styles.status}>{status}</Text> : null}
+          {error ? (
+            <Text style={[styles.status, styles.errorText]} accessibilityLiveRegion="polite">
+              {error}
+            </Text>
+          ) : null}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardEyebrow}>Mode</Text>
+          <Text style={styles.cardTitle}>Auto vs Manual</Text>
+          <RNView style={styles.row}>
+            <ToggleButton label="Auto" caption="Let the schedule run" active={power} onPress={() => updateMode(true)} />
+            <ToggleButton label="Manual" caption="You control every blink" active={!power} onPress={() => updateMode(false)} />
           </RNView>
-        </RNView>
-        {scheduleError ? <Text style={[styles.status, styles.errorText]}>{scheduleError}</Text> : null}
-      </View>
+        </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Duration</Text>
-        <Text style={styles.subtitle}>Blink length</Text>
-        <DurationSelect
-          value={durationMinutes}
-          onChange={handleDurationChange}
-          options={durationOptions}
-          disabled={scheduleDisabled}
-        />
-      </View>
+        <View style={styles.card}>
+          <Text style={styles.cardEyebrow}>Schedule</Text>
+          <Text style={styles.cardTitle}>Daily glow window</Text>
+          <Text style={styles.subtitle}>Set a 24h window for automatic sparkle.</Text>
+          <RNView style={styles.timeRow}>
+            <RNView style={styles.timeField}>
+              <Text style={styles.timeLabel}>From</Text>
+              <HourSelect
+                label="From"
+                value={scheduleStart}
+                onChange={handleScheduleStartChange}
+                options={hourOptions}
+                disabled={scheduleDisabled}
+              />
+            </RNView>
+            <RNView style={styles.timeField}>
+              <Text style={styles.timeLabel}>To</Text>
+              <HourSelect
+                label="To"
+                value={scheduleEnd}
+                onChange={handleScheduleEndChange}
+                options={hourOptions}
+                disabled={scheduleDisabled}
+              />
+            </RNView>
+          </RNView>
+          {scheduleError ? <Text style={[styles.status, styles.errorText]}>{scheduleError}</Text> : null}
+        </View>
 
-    </ScrollView>
+        <View style={styles.card}>
+          <Text style={styles.cardEyebrow}>Duration</Text>
+          <Text style={styles.cardTitle}>Blink length</Text>
+          <Text style={styles.subtitle}>Choose how long each burst shines.</Text>
+          <DurationSelect
+            value={durationMinutes}
+            onChange={handleDurationChange}
+            options={durationOptions}
+            disabled={scheduleDisabled}
+          />
+        </View>
+
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -642,45 +682,238 @@ function DurationSelect({
 }
 
 const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: "#04041f",
+    paddingTop: 16,
+  },
   screen: {
     padding: 20,
-    gap: 16,
-    backgroundColor: "#0F172A",
+    gap: 18,
+    paddingBottom: 42,
+  },
+  backdropOne: {
+    position: "absolute",
+    width: 240,
+    height: 240,
+    backgroundColor: "#ff4fd822",
+    borderRadius: 180,
+    top: -80,
+    right: -60,
+    transform: [{ rotate: "-12deg" }],
+  },
+  backdropTwo: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    backgroundColor: "#5bf3ff22",
+    borderRadius: 160,
+    bottom: -60,
+    left: -30,
+    transform: [{ rotate: "18deg" }],
+  },
+  heroCard: {
+    backgroundColor: "#0b1040",
+    borderRadius: 20,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: "#3146ff",
+    gap: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
+  },
+  heroKicker: {
+    color: "#5bf3ff",
+    fontWeight: "700",
+    letterSpacing: 0.3,
+    fontSize: 13,
+    textTransform: "uppercase",
+  },
+  heroTitle: {
+    color: "#fffdff",
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  heroSubtitle: {
+    color: "#d3ddff",
+    lineHeight: 22,
+  },
+  pageHeader: {
+    gap: 4,
+  },
+  pageTitle: {
+    color: "#fffdff",
+    fontSize: 26,
+    fontWeight: "800",
+  },
+  pageSubtitle: {
+    color: "#d3ddff",
+    fontSize: 14,
+  },
+  heroChips: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 8,
+  },
+  chip: {
+    flex: 1,
+    backgroundColor: "#111a4d",
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#3146ff",
+  },
+  chipAlt: {
+    backgroundColor: "#132555",
+    borderColor: "#ff4fd8",
+  },
+  chipLabel: {
+    color: "#a5b6ff",
+    fontSize: 12,
+    letterSpacing: 0.2,
+  },
+  chipValue: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 4,
   },
   headerCard: {
-    backgroundColor: "#111827",
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: "#111a4d",
+    borderRadius: 20,
+    padding: 18,
     borderWidth: 1,
-    borderColor: "#1F2937",
+    borderColor: "#3146ff",
     gap: 12,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
+  },
+  cardEyebrow: {
+    color: "#a5b6ff",
+    fontSize: 12,
+    letterSpacing: 0.4,
+  },
+  cardTitle: {
+    color: "#fffdff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  cardHint: {
+    color: "#d3ddff",
+    fontSize: 13,
   },
   roundButton: {
-    width: 140,
-    height: 140,
+    width: 150,
+    height: 150,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#ff4fd8",
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 12,
+    borderWidth: 4,
+    borderColor: "#04041f",
+  },
+  roundButtonOff: {
+    backgroundColor: "#ff4fd8",
+  },
+  roundButtonOn: {
+    backgroundColor: "#5bf3ff",
+  },
+  status: {
+    color: "#d3ddff",
+    fontSize: 13,
+    textAlign: "center",
+  },
+  errorText: {
+    color: "#ff9fcb",
+  },
+  card: {
+    backgroundColor: "#0b1040",
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#3146ff",
+    gap: 12,
     shadowColor: "#000",
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
-  roundButtonOff: {
-    backgroundColor: "#22C55E",
+  cardHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
   },
-  roundButtonOn: {
-    backgroundColor: "#FACC15",
+  syncButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#3146ff",
+    backgroundColor: "#0f1c56",
+    minWidth: 72,
+    alignItems: "center",
   },
-  title: {
-    fontSize: 24,
+  syncButtonText: {
+    color: "#fffdff",
     fontWeight: "700",
-    color: "#E5E7EB",
+  },
+  row: {
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "center",
+  },
+  toggle: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#3146ff",
+    backgroundColor: "#0f1c56",
+  },
+  toggleActive: {
+    borderColor: "#5bf3ff",
+    backgroundColor: "#122a63",
+  },
+  toggleLabel: {
+    color: "#fffdff",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  toggleLabelActive: {
+    color: "#e9ffff",
+  },
+  toggleCaption: {
+    color: "#d3ddff",
+    fontSize: 12,
+    marginTop: 4,
+  },
+  pageHeader: {
+    gap: 6,
+  },
+  pageTitle: {
+    color: "#fffdff",
+    fontSize: 26,
+    fontWeight: "800",
+  },
+  pageSubtitle: {
+    color: "#d3ddff",
+    fontSize: 14,
   },
   subtitle: {
-    color: "#9CA3AF",
+    color: "#d3ddff",
   },
   timeRow: {
     flexDirection: "row",
@@ -691,115 +924,45 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   timeLabel: {
-    color: "#9CA3AF",
+    color: "#a5b6ff",
     fontSize: 13,
   },
   pickerContainer: {
-    backgroundColor: "#1F2937",
-    borderRadius: 10,
+    backgroundColor: "#0f1c56",
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#374151",
+    borderColor: "#3146ff",
     overflow: "hidden",
   },
   picker: {
-    color: "#E5E7EB",
-    height: 52,
+    color: "#fffdff",
+    height: 56,
     width: "100%",
-    backgroundColor: "#1F2937",
+    backgroundColor: "#0f1c56",
   },
   pickerItem: {
-    color: "#E5E7EB",
+    color: "#fffdff",
     fontSize: 16,
   },
   hourButton: {
-    height: 52,
-    backgroundColor: "#1F2937",
-    borderRadius: 10,
+    height: 56,
+    backgroundColor: "#0f1c56",
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#374151",
+    borderColor: "#3146ff",
     alignItems: "center",
     justifyContent: "center",
   },
   hourButtonValue: {
-    color: "#E5E7EB",
+    color: "#fffdff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   hourButtonDisabled: {
     opacity: 0.6,
-    borderColor: "#2f3542",
+    borderColor: "#2a3163",
   },
   hourButtonDisabledText: {
-    color: "#6B7280",
-  },
-  status: {
-    color: "#9CA3AF",
-    fontSize: 13,
-  },
-  errorText: {
-    color: "#FCA5A5",
-  },
-  card: {
-    backgroundColor: "#111827",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#1F2937",
-    gap: 12,
-  },
-  cardHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  cardTitle: {
-    color: "#E5E7EB",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  syncButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#374151",
-    backgroundColor: "#1F2937",
-    minWidth: 72,
-    alignItems: "center",
-  },
-  syncButtonText: {
-    color: "#E5E7EB",
-    fontWeight: "600",
-  },
-  row: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-  },
-  toggle: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#374151",
-    backgroundColor: "#1F2937",
-  },
-  toggleActive: {
-    borderColor: "#22C55E",
-    backgroundColor: "#123026",
-  },
-  toggleLabel: {
-    color: "#E5E7EB",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  toggleLabelActive: {
-    color: "#CFFAFE",
-  },
-  toggleCaption: {
-    color: "#9CA3AF",
-    fontSize: 12,
-    marginTop: 2,
+    color: "#9aacff",
   },
 });

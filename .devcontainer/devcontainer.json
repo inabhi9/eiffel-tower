@@ -1,0 +1,8 @@
+{
+  "name": "Expo Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "postCreateCommand": "./.devcontainer/postCreateCommand.sh",
+  "mounts": ["source=node_modules_${devcontainerId},target=${containerWorkspaceFolder}/node_modules,type=volume"],
+  "forwardPorts": [8081],
+  "runArgs": ["-p=8081:8081", "--env-file", ".devcontainer/.env"],
+}

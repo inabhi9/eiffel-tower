@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "my-expo-project",
-    "slug": "my-expo-project",
+    "name": "Eiffel Tower LED",
+    "slug": "eiffel-tower-led",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "eiffel-tower-led",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./src/assets/images/splash.png",

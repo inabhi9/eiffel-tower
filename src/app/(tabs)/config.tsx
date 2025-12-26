@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Pressable, ScrollView, StyleSheet, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -29,7 +30,7 @@ export default function ConfigScreen() {
   }, [input, setBaseUrl]);
 
   return (
-    <SafeAreaView style={styles.page}>
+    <SafeAreaView style={styles.page} edges={["top", "left", "right"]}>
       <ScrollView contentContainerStyle={styles.screen}>
         <View style={styles.backdropOne} />
         <View style={styles.backdropTwo} />
@@ -41,10 +42,17 @@ export default function ConfigScreen() {
 
         <View style={styles.card}>
           <Text style={styles.eyebrow}>Connection</Text>
-          <Text style={styles.title}>Controller Base URL</Text>
+          <View style={styles.titleRow}>
+            <FontAwesome name="wifi" size={18} color="#5bf3ff" />
+            <Text style={styles.title}>Controller Base URL</Text>
+          </View>
           <Text style={styles.subtitle}>Used for all LED commands and mode sync.</Text>
 
           <View style={styles.inputShell}>
+            <View style={styles.inputLabelRow}>
+              <FontAwesome name="link" size={16} color="#a5b6ff" />
+              <Text style={styles.helper}>Controller address</Text>
+            </View>
             <TextInput
               value={input}
               onChangeText={setInput}
@@ -83,7 +91,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     gap: 16,
-    paddingBottom: 36,
+    paddingBottom: 0,
   },
   pageHeader: {
     gap: 6,
@@ -126,7 +134,7 @@ const styles = StyleSheet.create({
     borderColor: "#3146ff",
     gap: 12,
     shadowColor: "#000",
-    shadowOpacity: 0.3,
+    paddingBottom: 12,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
     elevation: 8,
@@ -143,12 +151,22 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "800",
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   subtitle: {
     color: "#d3ddff",
     fontSize: 14,
     lineHeight: 20,
   },
   inputShell: {
+    gap: 6,
+  },
+  inputLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   input: {

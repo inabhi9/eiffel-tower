@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View as RNView } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { router } from "expo-router";
 
 import { Text, View } from "@/components/Themed";
@@ -59,6 +60,7 @@ export default function WelcomeWizard() {
       <RNView style={styles.backdropTwo} />
 
       <RNView style={styles.logoRow}>
+        <FontAwesome name="star" size={16} color="#ff4fd8" />
         <Text style={styles.logoBadge}>Eiffel Tower</Text>
         <Text style={styles.logoSub}>LED Control</Text>
       </RNView>
@@ -66,20 +68,32 @@ export default function WelcomeWizard() {
       {step === 0 ? (
         <View style={styles.card}>
           <Text style={styles.eyebrow}>Welcome</Text>
-          <Text style={styles.title}>Launch your mini light show.</Text>
+          <RNView style={styles.titleRow}>
+            <FontAwesome name="rocket" size={18} color="#5bf3ff" />
+            <Text style={styles.title}>Launch your mini light show.</Text>
+          </RNView>
           <Text style={styles.subtitle}>
             Connect to your tower controller over Wi-Fi, blink on demand, and set playful schedules that keep the glow alive.
           </Text>
 
           <View style={styles.pillsRow}>
             <View style={styles.pill}>
-              <Text style={styles.pillLabel}>Blink bursts</Text>
+              <RNView style={styles.pillRow}>
+                <FontAwesome name="flash" size={14} color="#fffdff" />
+                <Text style={styles.pillLabel}>Blink bursts</Text>
+              </RNView>
             </View>
             <View style={[styles.pill, styles.pillAlt]}>
-              <Text style={styles.pillLabel}>Auto schedules</Text>
+              <RNView style={styles.pillRow}>
+                <FontAwesome name="clock-o" size={14} color="#fffdff" />
+                <Text style={styles.pillLabel}>Auto schedules</Text>
+              </RNView>
             </View>
             <View style={[styles.pill, styles.pillMint]}>
-              <Text style={styles.pillLabel}>Manual mode</Text>
+              <RNView style={styles.pillRow}>
+                <FontAwesome name="hand-o-up" size={14} color="#fffdff" />
+                <Text style={styles.pillLabel}>Manual mode</Text>
+              </RNView>
             </View>
           </View>
 
@@ -90,7 +104,10 @@ export default function WelcomeWizard() {
       ) : (
         <View style={styles.card}>
           <Text style={styles.eyebrow}>Setup</Text>
-          <Text style={styles.title}>Set the controller URL</Text>
+          <RNView style={styles.titleRow}>
+            <FontAwesome name="link" size={16} color="#ff4fd8" />
+            <Text style={styles.title}>Set the controller URL</Text>
+          </RNView>
           <Text style={styles.subtitle}>
             Enter the controller address (example: http://192.168.4.1). This URL powers every command.
           </Text>
@@ -145,6 +162,8 @@ const styles = StyleSheet.create({
   logoRow: {
     alignItems: "center",
     gap: 6,
+    flexDirection: "row",
+    justifyContent: "center",
   },
   logoBadge: {
     color: "#ff4fd8",
@@ -176,6 +195,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontSize: 12,
     textTransform: "uppercase",
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   title: {
     color: "#fffdff",
@@ -213,6 +237,11 @@ const styles = StyleSheet.create({
     color: "#fffdff",
     fontWeight: "700",
     fontSize: 12,
+  },
+  pillRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   input: {
     backgroundColor: "#0f1c56",

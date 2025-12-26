@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { Text, View } from "@/components/Themed";
 
@@ -11,7 +12,10 @@ export default function ModalScreen() {
 
       <View style={styles.card}>
         <Text style={styles.eyebrow}>About</Text>
-        <Text style={styles.title}>Eiffel Tower LED Controller</Text>
+        <View style={styles.titleRow}>
+          <FontAwesome name="info-circle" size={18} color="#5bf3ff" />
+          <Text style={styles.title}>Eiffel Tower LED Controller</Text>
+        </View>
         <Text style={styles.body}>
           This app sends quick commands to your tower controller: blink on tap, switch between Auto and Manual, and sync the schedule.
         </Text>
@@ -78,6 +82,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontSize: 12,
     textTransform: "uppercase",
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   title: {
     color: "#fffdff",

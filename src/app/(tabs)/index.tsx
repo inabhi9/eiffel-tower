@@ -425,7 +425,7 @@ export default function TowerControlScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.page}>
+    <SafeAreaView style={styles.page} edges={["top", "left", "right"]}>
       <View style={styles.backdropOne} />
       <View style={styles.backdropTwo} />
 
@@ -451,15 +451,25 @@ export default function TowerControlScreen() {
               </Text>
             </View>
             <View style={[styles.chip, styles.chipAlt]}>
+                <RNView style={styles.chipRow}>
+                  <FontAwesome name="link" size={14} color="#fffdff" />
+                  <Text style={styles.chipLabel}>Base URL</Text>
+                </RNView>
               <Text style={styles.chipLabel}>Mode</Text>
               <Text style={styles.chipValue}>{power ? "Auto" : "Manual"}</Text>
             </View>
           </RNView>
         </View>
-
+                <RNView style={styles.chipRow}>
+                  <FontAwesome name="toggle-on" size={16} color="#5bf3ff" />
+                  <Text style={styles.chipLabel}>Mode</Text>
+                </RNView>
         <View style={styles.headerCard}>
           <Text style={styles.cardEyebrow}>Instant Blink</Text>
-          <Text style={styles.cardTitle}>Spark the lights now</Text>
+          <RNView style={styles.cardTitleRow}>
+            <FontAwesome name="flash" size={18} color="#ff4fd8" />
+            <Text style={styles.cardTitle}>Spark the lights now</Text>
+          </RNView>
           <Pressable
             style={[styles.roundButton, ledOnUntil && ledOnUntil > Date.now() ? styles.roundButtonOn : styles.roundButtonOff]}
             onPress={sendCommand}
@@ -483,7 +493,10 @@ export default function TowerControlScreen() {
 
         <View style={styles.card}>
           <Text style={styles.cardEyebrow}>Mode</Text>
-          <Text style={styles.cardTitle}>Auto vs Manual</Text>
+          <RNView style={styles.cardTitleRow}>
+            <FontAwesome name="sliders" size={18} color="#5bf3ff" />
+            <Text style={styles.cardTitle}>Auto vs Manual</Text>
+          </RNView>
           <RNView style={styles.row}>
             <ToggleButton label="Auto" caption="Let the schedule run" active={power} onPress={() => updateMode(true)} />
             <ToggleButton label="Manual" caption="You control every blink" active={!power} onPress={() => updateMode(false)} />
@@ -492,7 +505,10 @@ export default function TowerControlScreen() {
 
         <View style={styles.card}>
           <Text style={styles.cardEyebrow}>Schedule</Text>
-          <Text style={styles.cardTitle}>Daily glow window</Text>
+          <RNView style={styles.cardTitleRow}>
+            <FontAwesome name="clock-o" size={18} color="#ff4fd8" />
+            <Text style={styles.cardTitle}>Daily glow window</Text>
+          </RNView>
           <Text style={styles.subtitle}>Set a 24h window for automatic sparkle.</Text>
           <RNView style={styles.timeRow}>
             <RNView style={styles.timeField}>
@@ -521,7 +537,10 @@ export default function TowerControlScreen() {
 
         <View style={styles.card}>
           <Text style={styles.cardEyebrow}>Duration</Text>
-          <Text style={styles.cardTitle}>Blink length</Text>
+          <RNView style={styles.cardTitleRow}>
+            <FontAwesome name="hourglass-half" size={18} color="#5bf3ff" />
+            <Text style={styles.cardTitle}>Blink length</Text>
+          </RNView>
           <Text style={styles.subtitle}>Choose how long each burst shines.</Text>
           <DurationSelect
             value={durationMinutes}
@@ -690,7 +709,7 @@ const styles = StyleSheet.create({
   screen: {
     padding: 20,
     gap: 18,
-    paddingBottom: 42,
+    paddingBottom: 0,
   },
   backdropOne: {
     position: "absolute",
@@ -758,6 +777,11 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 8,
   },
+  chipRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
   chip: {
     flex: 1,
     backgroundColor: "#111a4d",
@@ -799,6 +823,11 @@ const styles = StyleSheet.create({
     color: "#a5b6ff",
     fontSize: 12,
     letterSpacing: 0.4,
+  },
+  cardTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   cardTitle: {
     color: "#fffdff",

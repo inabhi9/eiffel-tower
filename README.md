@@ -39,3 +39,25 @@ Ensure that you have the following installed on your machine:
     - Once the container is running, open the terminal in VS Code.
     - Run the command `npm run start` to start the Expo server.
     - A QR code will appear in the terminal. Scan this with the Expo Go app on your smartphone to view the application.
+
+
+## Host Expo App On External Network
+
+Export following variables
+
+```
+export CI=1
+export EXPO_PACKAGER_PROXY_URL="https://your-public-url.example.com"
+```
+
+and run
+
+`npx expo start --no-dev --minify --offline`
+
+then open
+
+`exp://your-public-url.example.com`
+
+# Reference:
+
+- https://stackoverflow.com/questions/49125697/host-expo-app-on-external-network

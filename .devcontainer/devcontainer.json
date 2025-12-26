@@ -1,7 +1,9 @@
 {
-  "name": "Expo Dev Container",
+  "name": "Eiffel Tower App",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:22-bookworm",
   "postCreateCommand": "./.devcontainer/postCreateCommand.sh",
   "forwardPorts": [8081],
-  "runArgs": ["-p=8081:8081", "--env-file", ".devcontainer/.env"]
+  "features": {
+    "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {}
+  }
 }

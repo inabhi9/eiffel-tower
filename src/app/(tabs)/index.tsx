@@ -444,18 +444,20 @@ export default function TowerControlScreen() {
             Blink the tower, schedule glow hours, and toggle auto mode with a playful control board.
           </Text>
           <RNView style={styles.heroChips}>
-            <View style={styles.chip}>
-              <Text style={styles.chipLabel}>Base URL</Text>
+            <View style={[styles.chip]}>
+              <RNView style={styles.chipRow}> 
+                <FontAwesome name="link" size={14} color="#fffdff" />
+                <Text style={styles.chipLabel}>Base URL</Text>
+              </RNView>
               <Text style={styles.chipValue} numberOfLines={1}>
                 {controllerUrl || "Not set"}
               </Text>
             </View>
             <View style={[styles.chip, styles.chipAlt]}>
                 <RNView style={styles.chipRow}>
-                  <FontAwesome name="link" size={14} color="#fffdff" />
-                  <Text style={styles.chipLabel}>Base URL</Text>
+                  <FontAwesome name="toggle-on" size={14} color="#fffdff" />
+                  <Text style={styles.chipLabel}>Mode</Text>
                 </RNView>
-              <Text style={styles.chipLabel}>Mode</Text>
               <Text style={styles.chipValue}>{power ? "Auto" : "Manual"}</Text>
             </View>
           </RNView>

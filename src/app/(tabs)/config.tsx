@@ -95,11 +95,13 @@ const styles = StyleSheet.create({
   },
   pageHeader: {
     gap: 6,
+    backgroundColor: "transparent",
   },
   pageTitle: {
     color: "#fffdff",
     fontSize: 24,
     fontWeight: "800",
+    backgroundColor: "transparent",
   },
   pageSubtitle: {
     color: "#d3ddff",
@@ -127,17 +129,13 @@ const styles = StyleSheet.create({
     transform: [{ rotate: "18deg" }],
   },
   card: {
-    backgroundColor: "#0b1040",
+    backgroundColor: "transparent",
     borderRadius: 20,
     padding: 18,
     borderWidth: 1,
     borderColor: "#3146ff",
     gap: 12,
-    shadowColor: "#000",
     paddingBottom: 12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 8,
   },
   eyebrow: {
     color: "#5bf3ff",
@@ -150,11 +148,13 @@ const styles = StyleSheet.create({
     color: "#fffdff",
     fontSize: 22,
     fontWeight: "800",
+    backgroundColor: "transparent",
   },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    backgroundColor: "transparent",
   },
   subtitle: {
     color: "#d3ddff",
@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    backgroundColor: "transparent",
   },
   input: {
     backgroundColor: "#0f1c56",

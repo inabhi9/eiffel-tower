@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
     color: "#5bf3ff",
     fontWeight: "700",
     letterSpacing: 0.4,
+    backgroundColor: "transparent",
     fontSize: 12,
     textTransform: "uppercase",
   },
@@ -206,6 +207,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "800",
     lineHeight: 30,
+    backgroundColor: "transparent",
   },
   subtitle: {
     color: "#d3ddff",

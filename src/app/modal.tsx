@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
     color: "#fffdff",
     fontSize: 22,
     fontWeight: "800",
+    backgroundColor: "transparent",
   },
   body: {
     color: "#d3ddff",

@@ -750,11 +750,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     fontSize: 13,
     textTransform: "uppercase",
+    backgroundColor: "transparent",
   },
   heroTitle: {
     color: "#fffdff",
     fontSize: 24,
     fontWeight: "800",
+    backgroundColor: "transparent",
   },
   heroSubtitle: {
     color: "#d3ddff",
@@ -767,6 +769,7 @@ const styles = StyleSheet.create({
     color: "#fffdff",
     fontSize: 26,
     fontWeight: "800",
+    backgroundColor: "transparent",
   },
   pageSubtitle: {
     color: "#d3ddff",
@@ -833,6 +836,7 @@ const styles = StyleSheet.create({
     color: "#fffdff",
     fontSize: 18,
     fontWeight: "700",
+    backgroundColor: "transparent",
   },
   cardHint: {
     color: "#d3ddff",
@@ -931,11 +935,13 @@ const styles = StyleSheet.create({
   },
   pageHeader: {
     gap: 6,
+    backgroundColor: "transparent",
   },
   pageTitle: {
     color: "#fffdff",
     fontSize: 26,
     fontWeight: "800",
+    backgroundColor: "transparent",
   },
   pageSubtitle: {
     color: "#d3ddff",
@@ -986,6 +992,7 @@ const styles = StyleSheet.create({
     color: "#fffdff",
     fontSize: 16,
     fontWeight: "700",
+    backgroundColor: "transparent",
   },
   hourButtonDisabled: {
     opacity: 0.6,

@@ -1,9 +1,12 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Picker } from "@react-native-picker/picker";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActionSheetIOS,
   ActivityIndicator,
+  Animated,
+  Easing,
   Platform,
   Pressable,
   RefreshControl,
@@ -32,10 +35,28 @@ export default function TowerControlScreen() {
   const [scheduleStart, setScheduleStart] = useState("08:00");
   const [scheduleEnd, setScheduleEnd] = useState("18:00");
   const [durationMinutes, setDurationMinutes] = useState(1);
+  const sparkleAnim = useRef(new Animated.Value(0)).current;
+  const sparkleLoop = useRef<Animated.CompositeAnimation | null>(null);
+  const confettiPieces = useMemo(
+    () =>
+      Array.from({ length: 14 }, () => ({
+        progress: new Animated.Value(0),
+        startX: Math.random() * 120 - 60,
+        endX: Math.random() * 90 - 45,
+        startY: Math.random() * -20,
+        endY: Math.random() * 90 + 40,
+        rotation: Math.random() * 180,
+        size: Math.random() * 6 + 6,
+        color: ["#ff4fd8", "#5bf3ff", "#ffd166", "#6cffe6"][(Math.random() * 4) | 0],
+      })),
+    [],
+  );
+  const confettiLoops = useRef<Animated.CompositeAnimation[]>([]);
 
   const hourOptions = useMemo(() => Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`), []);
   const durationOptions = useMemo(() => [1, 2, 3, 4, 5], []);
   const scheduleDisabled = !power;
+  const isBlinking = ledOnUntil !== null && ledOnUntil > Date.now();
 
   const formatHour = useCallback((hour: number) => `${String(Math.min(23, Math.max(0, Math.floor(hour)))).padStart(2, "0")}:00`, []);
 
@@ -162,10 +183,6 @@ export default function TowerControlScreen() {
   }, [controllerUrl]);
 
   const blinkUrl = useMemo(() => {
-          <View style={styles.pageHeader}>
-            <Text style={styles.pageTitle}>Eiffel Tower LED</Text>
-            <Text style={styles.pageSubtitle}>Control, schedule, and blink your tower over Wi-Fi.</Text>
-          </View>
     try {
       return new URL("/blink", controllerUrl).toString();
     } catch (err) {
@@ -205,6 +222,64 @@ export default function TowerControlScreen() {
   }, []);
 
   useEffect(() => () => clearLedTimer(), [clearLedTimer]);
+
+  useEffect(() => {
+    if (isBlinking) {
+      sparkleLoop.current?.stop();
+      sparkleAnim.setValue(0);
+      sparkleLoop.current = Animated.loop(
+        Animated.sequence([
+          Animated.timing(sparkleAnim, {
+            toValue: 1,
+            duration: 520,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(sparkleAnim, {
+            toValue: 0,
+            duration: 520,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+      sparkleLoop.current.start();
+    } else {
+      sparkleLoop.current?.stop();
+      sparkleLoop.current = null;
+      sparkleAnim.setValue(0);
+    }
+
+    return () => {
+      sparkleLoop.current?.stop();
+    };
+  }, [isBlinking, sparkleAnim]);
+
+  useEffect(() => {
+    confettiLoops.current.forEach((loop) => loop.stop());
+    confettiLoops.current = [];
+
+    if (isBlinking) {
+      confettiPieces.forEach((piece, index) => {
+        piece.progress.setValue(0);
+        const loop = Animated.loop(
+          Animated.timing(piece.progress, {
+            toValue: 1,
+            duration: 1200 + index * 45,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: true,
+          }),
+        );
+        confettiLoops.current.push(loop);
+        loop.start();
+      });
+    }
+
+    return () => {
+      confettiLoops.current.forEach((loop) => loop.stop());
+      confettiLoops.current = [];
+    };
+  }, [confettiPieces, isBlinking]);
 
   const sendCommand = useCallback(async () => {
     if (!durationUrl || !blinkUrl) {
@@ -280,6 +355,66 @@ export default function TowerControlScreen() {
       return "";
     }
   }, [controllerUrl]);
+
+  const sparkleStyle = useMemo(
+    () => ({
+      transform: [
+        {
+          scale: sparkleAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.18] }),
+        },
+        {
+          rotate: sparkleAnim.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "2deg"] }),
+        },
+      ],
+      opacity: sparkleAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0.88] }),
+    }),
+    [sparkleAnim],
+  );
+
+  const renderConfetti = useCallback(
+    () =>
+      confettiPieces.map((piece, i) => (
+        <Animated.View
+          key={`confetti-${i}`}
+          style={[
+            styles.confettiPiece,
+            {
+              width: piece.size,
+              height: piece.size * 1.4,
+              backgroundColor: piece.color,
+              transform: [
+                {
+                  translateX: piece.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [piece.startX, piece.endX],
+                  }),
+                },
+                {
+                  translateY: piece.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [piece.startY, piece.endY],
+                  }),
+                },
+                {
+                  rotate: piece.progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [`${piece.rotation}deg`, `${piece.rotation + 220}deg`],
+                  }),
+                },
+                {
+                  scale: piece.progress.interpolate({
+                    inputRange: [0, 0.5, 1],
+                    outputRange: [0.9, 1.2, 0.95],
+                  }),
+                },
+              ],
+              opacity: piece.progress.interpolate({ inputRange: [0, 0.2, 0.8, 1], outputRange: [0, 0.9, 0.6, 0] }),
+            },
+          ]}
+        />
+      )),
+    [confettiPieces],
+  );
 
   const fetchMode = useCallback(async () => {
     if (!modeUrl) {
@@ -417,13 +552,6 @@ export default function TowerControlScreen() {
     handleRefresh();
   }, [isReady, controllerUrl, handleRefresh]);
 
-  const bumpBrightness = useCallback(
-    (delta: number) => {
-      setBrightness((current) => Math.min(100, Math.max(5, current + delta)));
-    },
-    [],
-  );
-
   return (
     <SafeAreaView style={styles.page} edges={["top", "left", "right"]}>
       <View style={styles.backdropOne} />
@@ -434,7 +562,10 @@ export default function TowerControlScreen() {
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor="#ff4fd8" />}
       >
         <View style={styles.pageHeader}>
-          <Text style={styles.pageTitle}>Eiffel Tower LED</Text>
+          <RNView style={styles.pageTitleRow}>
+            <MaterialCommunityIcons name="eiffel-tower" size={26} color="#ff4fd8" />
+            <Text style={styles.pageTitle}>Eiffel Tower LED</Text>
+          </RNView>
           <Text style={styles.pageSubtitle}>Control, schedule, and blink your tower over Wi-Fi.</Text>
         </View>
         <View style={styles.heroCard}>
@@ -481,7 +612,10 @@ export default function TowerControlScreen() {
             {isSending ? (
               <ActivityIndicator color="#04041f" size="large" />
             ) : (
-              <FontAwesome name="lightbulb-o" size={56} color="#04041f" />
+              <Animated.View style={[styles.iconWrap, isBlinking && styles.iconGlow, isBlinking && sparkleStyle]}>
+                {isBlinking ? <RNView pointerEvents="none" style={styles.confettiLayer}>{renderConfetti()}</RNView> : null}
+                <MaterialCommunityIcons name="eiffel-tower" size={64} color="#04041f" />
+              </Animated.View>
             )}
           </Pressable>
           <Text style={styles.cardHint}>Tap to blink for the configured duration.</Text>
@@ -864,6 +998,26 @@ const styles = StyleSheet.create({
   roundButtonOn: {
     backgroundColor: "#5bf3ff",
   },
+  iconWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  iconGlow: {
+    shadowColor: "#fff3b0",
+    shadowOpacity: 0.55,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 0 },
+  },
+  confettiLayer: {
+    position: "absolute",
+    inset: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confettiPiece: {
+    position: "absolute",
+    borderRadius: 3,
+  },
   status: {
     color: "#d3ddff",
     fontSize: 13,
@@ -938,6 +1092,11 @@ const styles = StyleSheet.create({
   pageHeader: {
     gap: 6,
     backgroundColor: "transparent",
+  },
+  pageTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   pageTitle: {
     color: "#fffdff",

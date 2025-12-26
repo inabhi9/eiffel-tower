@@ -1,4 +1,5 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Link, Redirect, Tabs } from "expo-router";
 import { Pressable, useColorScheme } from "react-native";
 
@@ -55,7 +56,9 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Tower LED",
-          tabBarIcon: ({ color }) => <TabBarIcon name="lightbulb-o" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="eiffel-tower" size={28} color={color} style={{ marginBottom: -3 }} />
+          ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>

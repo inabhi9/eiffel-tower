@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Pressable, ScrollView, StyleSheet, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -36,7 +37,10 @@ export default function ConfigScreen() {
         <View style={styles.backdropTwo} />
 
         <View style={styles.pageHeader}>
-          <Text style={styles.pageTitle}>Configuration</Text>
+          <View style={styles.pageTitleRow}>
+            <MaterialCommunityIcons name="cog-outline" size={24} color="#5bf3ff" />
+            <Text style={styles.pageTitle}>Configuration</Text>
+          </View>
           <Text style={styles.pageSubtitle}>Set the controller base URL so commands can reach your tower.</Text>
         </View>
 
@@ -96,6 +100,11 @@ const styles = StyleSheet.create({
   pageHeader: {
     gap: 6,
     backgroundColor: "transparent",
+  },
+  pageTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   pageTitle: {
     color: "#fffdff",

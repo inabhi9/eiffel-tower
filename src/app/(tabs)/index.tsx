@@ -46,8 +46,8 @@ export default function TowerControlScreen() {
         startY: Math.random() * -20,
         endY: Math.random() * 90 + 40,
         rotation: Math.random() * 180,
-        size: Math.random() * 6 + 6,
-        color: ["#ff4fd8", "#5bf3ff", "#ffd166", "#6cffe6"][(Math.random() * 4) | 0],
+        size: Math.random() * 8 + 12,
+        color: ["#ffb3ff", "#5bf3ff", "#ffd166", "#f6ff8f"][(Math.random() * 4) | 0],
       })),
     [],
   );
@@ -379,9 +379,6 @@ export default function TowerControlScreen() {
           style={[
             styles.confettiPiece,
             {
-              width: piece.size,
-              height: piece.size * 1.4,
-              backgroundColor: piece.color,
               transform: [
                 {
                   translateX: piece.progress.interpolate({
@@ -411,7 +408,9 @@ export default function TowerControlScreen() {
               opacity: piece.progress.interpolate({ inputRange: [0, 0.2, 0.8, 1], outputRange: [0, 0.9, 0.6, 0] }),
             },
           ]}
-        />
+        >
+          <MaterialCommunityIcons name="star-four-points" size={piece.size} color={piece.color} />
+        </Animated.View>
       )),
     [confettiPieces],
   );
@@ -1016,7 +1015,6 @@ const styles = StyleSheet.create({
   },
   confettiPiece: {
     position: "absolute",
-    borderRadius: 3,
   },
   status: {
     color: "#d3ddff",

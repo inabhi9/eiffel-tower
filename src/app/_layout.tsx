@@ -26,12 +26,6 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
   if (!loaded) {
     return null;
   }
@@ -53,6 +47,13 @@ function InnerNav({ colorScheme }: { colorScheme: "light" | "dark" | null | unde
   const { isReady, baseUrl } = useControllerConfig();
   const isConfigured = baseUrl.trim().length > 0;
   const initialRouteName = isConfigured ? "(tabs)" : "welcome";
+
+  // Keep the native splash visible until configuration is ready to avoid a blank screen.
+  useEffect(() => {
+    if (isReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [isReady]);
 
   if (!isReady) {
     return null;

@@ -1,47 +1,61 @@
-# react-native-expo-devcontainer-template
+# Eiffel Tower LED
 
-This template provides an example for setting up a development environment for React Native Expo applications using Dev Containers. 
-To set up the container, please follow the instructions below:
+Goal of this project is experience Vibe-coding and also make my wife a little more happier.
 
-## Prerequisites
+This project is consist of two main components. Hardware and the App.
 
-Ensure that you have the following installed on your machine:
+## The Hardware
 
-- [VS Code](https://code.visualstudio.com/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) for VS Code
-- [Expo Go](https://expo.dev/client) app on your smartphone
+Eiffel Tower souvenir was purchased during our Paris visit. 
+It has a on-off switch and operates on 3-AA batteries.
+Turning it on, sparkles multiple LEDs.
 
-## Setup Instructions
+**Components:**
 
-1. Create a New Repository:
+- [ESP32-C3 Supermini](https://de.aliexpress.com/item/1005007479144456.html)
+- [1-Channel Relay](https://de.aliexpress.com/item/1005002983784189.html)
 
-    - Navigate to the [original repository page](https://github.com/matsu3m/react-native-expo-devcontainer-template) on GitHub.
-    - Click on `Use this template` to create a new repository based on this template.
+**Circuit Diagram**
 
-2. Clone the Project:
-
-    - Clone the newly created repository to your local machine.
-    - Open the cloned project in VS Code.
-
-3. Set Up Environment Variables:
-
-    - In the `.devcontainer` directory of your project, create a `.env` file.
-    - Add the following line to the `.env` file: `REACT_NATIVE_PACKAGER_HOSTNAME=192.168.xxx.xxx` - Replace `192.168.xxx.xxx` with your host machine's local IP address.
-
-4. Reopen in Container:
-
-    - Open the Command Palette in VS Code.
-    - Select `Dev Containers: Reopen in Container`. VS Code will then start building the container and open the project inside it.
-
-5. Start the Expo Server:
-
-    - Once the container is running, open the terminal in VS Code.
-    - Run the command `npm run start` to start the Expo server.
-    - A QR code will appear in the terminal. Scan this with the Expo Go app on your smartphone to view the application.
+TBD
 
 
-## Host Expo App On External Network
+**Firmware**
+
+I use Arduino IDE in MacOS Tahoe (Intel) to write a firmware. It supports following feature:
+
+- Turn on the relay to sparkle(the souvenir's built-in feature) Eiffel Tower every hour from 18:00 to 22:00 for 1-minute duration.
+- It connects to wifi and sync time.
+- Exposes HTTP server to configure duration, time range and mode (auto-manual) and trigger manual sparkle.
+
+## The App (Vibe-coded)
+
+This app is entirely Vibe-coded using GPT-5.1-Codex-Max in VS Code Copilot.
+
+**Initial Setup**
+
+- Since my entire workflow is around VS Code Web using Devcontainer and Coder, I use 
+[react-native-expo-devcontainer](https://github.com/zketosis/react-native-expo-devcontainer-template) template.
+- The template uses [Expo](https://expo.dev/) framework for react-native app development.
+
+**Setup**
+
+- Rename `.env.example` to `.env` and adjust the variable value.
+If you've locally reachable http proxy server, then use `EXPO_PACKAGER_PROXY_URL` otherwise `REACT_NATIVE_PACKAGER_HOSTNAME` should be enough.
+
+- Install Expo android/ios app your phone. 
+
+- Run `npm start` and scan the QR code on your phone which should open the app inside Expo.
+
+**Compile App for Android**
+
+- Run `npm run build:android`
+
+**Tips to Run on iOS**
+
+Since we cannot sideload `IPA` files, we can host expo server and open the app from Expo app.
+
+Instruction:
 
 Export following variables
 

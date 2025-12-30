@@ -1,5 +1,11 @@
 # Eiffel Tower LED
 
+
+<p align="center">
+  <img width="50%" src="assets/demo.gif">
+</p>
+
+
 A small hardware-plus-app project that turns a Paris souvenir into a scheduled, WiFi-enabled LED show. The repo contains firmware for an ESP32-C3-based relay controller and an Expo app for scheduling and manual control.
 
 ## What is here

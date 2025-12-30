@@ -1,84 +1,68 @@
 # Eiffel Tower LED
 
-Goal of this project is experience Vibe-coding and also make my wife a little more happier.
+A small hardware-plus-app project that turns a Paris souvenir into a scheduled, WiFi-enabled LED show. The repo contains firmware for an ESP32-C3-based relay controller and an Expo app for scheduling and manual control.
 
-This project is consist of two main components. Hardware and the App.
+## What is here
 
-## The Hardware
+- Hardware: ESP32-C3 Supermini driving a relay that toggles the tower's built-in LEDs.
+- Firmware: Arduino sketch that keeps time via WiFi, schedules sparkles, and exposes a tiny HTTP API for control.
+- App: Expo (React Native) client for viewing status, triggering sparkles, and adjusting the schedule. Built end-to-end with GPT-5.1-Codex-Max (Vibe-coded).
 
-Eiffel Tower souvenir was purchased during our Paris visit. 
-It has a on-off switch and operates on 3-AA batteries.
-Turning it on, sparkles multiple LEDs.
+## Hardware
 
-**Components:**
-
-- [ESP32-C3 Supermini](https://de.aliexpress.com/item/1005007479144456.html)
-- [1-Channel Relay](https://de.aliexpress.com/item/1005002983784189.html)
-
-**[Circuit Diagram](https://app.cirkitdesigner.com/project/8b2d8786-043a-4003-bc49-5281fa629f37)**
+- Eiffel Tower souvenir with a built-in LED sparkle mode (3x AA, on/off switch).
+- Components: [ESP32-C3 Supermini](https://de.aliexpress.com/item/1005007479144456.html) and [1-channel relay](https://de.aliexpress.com/item/1005002983784189.html).
+- Circuit: [diagram](https://app.cirkitdesigner.com/project/8b2d8786-043a-4003-bc49-5281fa629f37) and build photo below.
 
 <img src="assets/circuit_image.png" width=20%>
 
+## Firmware (Arduino)
 
-**Firmware**
+- Written with Arduino IDE on macOS (Intel).
+- Features:
+    - Hourly sparkle window from 18:00 to 22:00, 1-minute duration per trigger (adjustable).
+    - WiFi time sync.
+    - Minimal HTTP server to configure duration, time range, and mode (auto/manual), plus manual trigger.
 
-I use Arduino IDE in MacOS Tahoe (Intel) to write a firmware. It supports following feature:
-
-- Turn on the relay to sparkle(the souvenir's built-in feature) Eiffel Tower every hour from 18:00 to 22:00 for 1-minute duration.
-- It connects to wifi and sync time.
-- Exposes HTTP server to configure duration, time range and mode (auto-manual) and trigger manual sparkle.
-
-## The App (Vibe-coded)
+## Mobile app (Expo)
 
 <p>
-    <img src="assets/app-welcome.jpg" width=20%>
-    <img src="assets/app-main1.jpg" width=20%>
-    <img src="assets/app-main2.jpg" width=20%>
-    <img src="assets/app-config.jpg" width=20%>
+        <img src="assets/app-welcome.jpg" width=20%>
+        <img src="assets/app-main1.jpg" width=20%>
+        <img src="assets/app-main2.jpg" width=20%>
+        <img src="assets/app-config.jpg" width=20%>
 </p>
 
-This app is entirely Vibe-coded using GPT-5.1-Codex-Max in VS Code Copilot.
+- Stack: Expo React Native, developed inside a devcontainer from [react-native-expo-devcontainer](https://github.com/zketosis/react-native-expo-devcontainer-template).
+- Purpose: View the current schedule, toggle modes, and trigger sparkles manually.
 
-**Initial Setup**
+## Setup
 
-- Since my entire workflow is around VS Code Web using Devcontainer and Coder, I use 
-[react-native-expo-devcontainer](https://github.com/zketosis/react-native-expo-devcontainer-template) template.
-- The template uses [Expo](https://expo.dev/) framework for react-native app development.
+1) Copy environment template:
+     - Rename `.env.example` to `.env` and fill in values.
+     - If you have a reachable HTTP proxy, set `EXPO_PACKAGER_PROXY_URL`; otherwise `REACT_NATIVE_PACKAGER_HOSTNAME` is usually sufficient.
 
-**Setup**
+2) Install dependencies and start Expo:
+     - `npm install`
+     - `npm start`
+     - Scan the QR code in the Expo Go app on your phone.
 
-- Rename `.env.example` to `.env` and adjust the variable value.
-If you've locally reachable http proxy server, then use `EXPO_PACKAGER_PROXY_URL` otherwise `REACT_NATIVE_PACKAGER_HOSTNAME` should be enough.
+## Build
 
-- Install Expo android/ios app your phone. 
+- Android APK/AAB: `npm run build:android`
 
-- Run `npm start` and scan the QR code on your phone which should open the app inside Expo.
+## iOS usage tip
 
-**Compile App for Android**
-
-- Run `npm run build:android`
-
-**Tips to Run on iOS**
-
-Since we cannot sideload `IPA` files, we can host expo server and open the app from Expo app.
-
-Instruction:
-
-Export following variables
+Sideloading is not supported here, so host Expo and open from Expo Go:
 
 ```
 export CI=1
 export EXPO_PACKAGER_PROXY_URL="https://your-public-url.example.com"
+npx expo start --no-dev --minify --offline
 ```
 
-and run
+Then open `exp://your-public-url.example.com` from Expo Go.
 
-`npx expo start --no-dev --minify --offline`
-
-then open
-
-`exp://your-public-url.example.com`
-
-# Reference:
+## Reference
 
 - https://stackoverflow.com/questions/49125697/host-expo-app-on-external-network

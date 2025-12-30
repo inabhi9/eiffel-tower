@@ -15,9 +15,9 @@ Turning it on, sparkles multiple LEDs.
 - [ESP32-C3 Supermini](https://de.aliexpress.com/item/1005007479144456.html)
 - [1-Channel Relay](https://de.aliexpress.com/item/1005002983784189.html)
 
-**Circuit Diagram**
+**[Circuit Diagram](https://app.cirkitdesigner.com/project/8b2d8786-043a-4003-bc49-5281fa629f37)**
 
-TBD
+![TBD](arduino/circuit_image.png)
 
 
 **Firmware**

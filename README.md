@@ -17,7 +17,7 @@ Turning it on, sparkles multiple LEDs.
 
 **[Circuit Diagram](https://app.cirkitdesigner.com/project/8b2d8786-043a-4003-bc49-5281fa629f37)**
 
-![TBD](arduino/circuit_image.png)
+<img src="assets/circuit_image.png" width=20%>
 
 
 **Firmware**
@@ -29,6 +29,12 @@ I use Arduino IDE in MacOS Tahoe (Intel) to write a firmware. It supports follow
 - Exposes HTTP server to configure duration, time range and mode (auto-manual) and trigger manual sparkle.
 
 ## The App (Vibe-coded)
+
+<img src="assets/app-welcome.jpg" width=20%>
+<img src="assets/app-main1.jpg" width=20%>
+<img src="assets/app-main2.jpg" width=20%>
+<img src="assets/app-config.jpg" width=20%>
+
 
 This app is entirely Vibe-coded using GPT-5.1-Codex-Max in VS Code Copilot.
 

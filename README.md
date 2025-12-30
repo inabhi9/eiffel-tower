@@ -31,7 +31,10 @@ I use Arduino IDE in MacOS Tahoe (Intel) to write a firmware. It supports follow
 ## The App (Vibe-coded)
 
 <p>
- 
+    <img src="assets/app-welcome.jpg" width=20%>
+    <img src="assets/app-main1.jpg" width=20%>
+    <img src="assets/app-main2.jpg" width=20%>
+    <img src="assets/app-config.jpg" width=20%>
 </p>
 
 This app is entirely Vibe-coded using GPT-5.1-Codex-Max in VS Code Copilot.

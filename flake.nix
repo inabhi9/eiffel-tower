@@ -1,5 +1,5 @@
 {
-  description = "My Android project";
+  description = "Eiffel Tower Expo project";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
